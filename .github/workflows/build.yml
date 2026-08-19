@@ -23,7 +23,10 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Install System Build Tools
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install System Dependencies
       run: |
         sudo apt-get update -qq
         sudo apt-get install -y --no-install-recommends \
@@ -35,10 +38,7 @@ jobs:
 
     - name: Build with Buildozer
       run: |
-        export ANDROIDSDK="$HOME/.buildozer/android/platform/android-sdk"
-        mkdir -p "$ANDROIDSDK/licenses" || true
-        echo -e "24333f8a63b6825ea9c5514f83c2829b004d1fee\nd56f5185479d641e4f4d17038c15a7424180b791" > "$ANDROIDSDK/licenses/android-sdk-license"
-        buildozer -v android debug
+        yes | buildozer -v android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
