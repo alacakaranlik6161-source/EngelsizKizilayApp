@@ -23,14 +23,22 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Install Buildozer & Cython
+    - name: Install System Build Tools
       run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y --no-install-recommends \
+          git zip unzip autoconf libtool pkg-config zlib1g-dev \
+          libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev \
+          libssl-dev ccache ninja-build
         python -m pip install --upgrade pip
         pip install "cython<3.0.0" buildozer
 
-    - name: Accept Android Licenses & Build
+    - name: Build with Buildozer
       run: |
-        yes | buildozer -v android debug
+        export ANDROIDSDK="$HOME/.buildozer/android/platform/android-sdk"
+        mkdir -p "$ANDROIDSDK/licenses" || true
+        echo -e "24333f8a63b6825ea9c5514f83c2829b004d1fee\nd56f5185479d641e4f4d17038c15a7424180b791" > "$ANDROIDSDK/licenses/android-sdk-license"
+        buildozer -v android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
